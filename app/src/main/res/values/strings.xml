@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">TrendGlance</string>
+    <string name="widget_description">Displays top trending Google search topics on your home screen.</string>
+</resources>

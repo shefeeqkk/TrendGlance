@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Modern upward trending arrow -->
+    <path
+        android:fillColor="#03DAC6"
+        android:pathData="M24,80 l20,-24 l16,16 l24,-32 v-16 l-24,32 l-16,-16 l-20,24 z" />
+
+    <!-- Secondary graphic element / node -->
+    <path
+        android:fillColor="#6200EE"
+        android:pathData="M78,24 h12 v12 h-12 z" />
+</vector>
