@@ -17,12 +17,14 @@
   "author": "TrendGlance Team",
   "license": "MIT",
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "google-auth-library": "^9.15.0",
     "jsonwebtoken": "^9.0.3",
-    "mongoose": "^8.9.5"
+    "mongoose": "^8.9.5",
+    "rss-parser": "^3.13.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.9"
