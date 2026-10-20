@@ -26,6 +26,21 @@ mongoose.connect(mongoUri)
     });
 
 /**
+ * Root Landing Route
+ */
+app.get('/', (req, res) => {
+    res.status(200).json({
+        service: 'TrendGlance Auth Backend Server',
+        status: 'Active',
+        endpoints: {
+            health: 'GET /api/health',
+            googleAuth: 'POST /api/auth/google'
+        },
+        mongoConnected: mongoose.connection.readyState === 1
+    });
+});
+
+/**
  * Health check endpoint
  */
 app.get('/api/health', (req, res) => {
@@ -38,17 +53,35 @@ app.get('/api/health', (req, res) => {
 });
 
 /**
+ * GET Info Route for /api/auth/google
+ * Responds gracefully when visited in a browser via GET request.
+ */
+app.get('/api/auth/google', (req, res) => {
+    res.status(200).json({
+        message: 'This endpoint expects an HTTP POST request with JSON body { idToken, email, name } from Retrofit or cURL.',
+        acceptedMethod: 'POST',
+        endpoint: '/api/auth/google',
+        examplePayload: {
+            idToken: 'google_id_token_sample',
+            email: 'user.trends@gmail.com',
+            name: 'Google Trends User'
+        },
+        healthCheckUrl: '/api/health'
+    });
+});
+
+/**
  * Authentication Endpoint: @POST("api/auth/google")
  * Verifies Google ID Token (or saves payload) and upserts user in MongoDB Atlas.
  */
 app.post('/api/auth/google', async (req, res) => {
     try {
-        const { idToken, email, name } = req.body;
+        const { idToken, email, name } = req.body || {};
 
         if (!idToken) {
             return res.status(400).json({
                 success: false,
-                message: 'idToken is required'
+                message: 'idToken is required in request body'
             });
         }
 
