@@ -88,6 +88,7 @@ app.post('/api/auth/google', async (req, res) => {
         let userGoogleId = `google_user_${Date.now()}`;
         let userEmail = email || 'user.trends@gmail.com';
         let userName = name || 'Google Trends User';
+        let userAvatarUrl = null;
 
         // 1. Verify Google ID Token if client ID is configured
         if (googleWebClientId && !idToken.startsWith('mock_')) {
@@ -100,6 +101,7 @@ app.post('/api/auth/google', async (req, res) => {
                 userGoogleId = payload['sub'];
                 userEmail = payload['email'] || userEmail;
                 userName = payload['name'] || userName;
+                userAvatarUrl = payload['picture'] || null;
             } catch (authErr) {
                 console.warn('⚠️ Google Token verification warning (using fallback profile):', authErr.message);
             }
@@ -107,27 +109,33 @@ app.post('/api/auth/google', async (req, res) => {
 
         // 2. Upsert User profile into MongoDB Atlas database
         let user = null;
+        let sessionToken = null;
         if (mongoose.connection.readyState === 1) {
-            user = await User.findOne({
-                $or: [{ googleId: userGoogleId }, { email: userEmail }]
-            });
+            const updateData = {
+                email: userEmail,
+                name: userName,
+                avatarUrl: userAvatarUrl,
+                lastLogin: new Date()
+            };
 
-            if (!user) {
-                user = new User({
-                    googleId: userGoogleId,
-                    email: userEmail,
-                    name: userName,
-                    createdAt: new Date(),
-                    lastLogin: new Date()
-                });
-                await user.save();
-                console.log(`👤 New user created in MongoDB Atlas: ${userEmail}`);
-            } else {
-                user.lastLogin = new Date();
-                if (userName && user.name !== userName) user.name = userName;
-                await user.save();
-                console.log(`🔄 Existing user logged in via MongoDB Atlas: ${userEmail}`);
-            }
+            // Using findOneAndUpdate with upsert option to atomic create or update
+            user = await User.findOneAndUpdate(
+                { googleId: userGoogleId },
+                { $set: updateData },
+                { upsert: true, new: true, setDefaultsOnInsert: true }
+            );
+
+            console.log(`👤 User Upserted in MongoDB Atlas: ${user.email}`);
+
+            // Optional: Generate a simple JWT session token
+            // In a production app, use jwt.sign with a real secret
+            const jwt = require('jsonwebtoken');
+            const JWT_SECRET = process.env.JWT_SECRET || 'trendglance_super_secret_key_123';
+            sessionToken = jwt.sign(
+                { userId: user._id, googleId: user.googleId, email: user.email },
+                JWT_SECRET,
+                { expiresIn: '7d' }
+            );
         }
 
         // 3. Send Success Response
@@ -136,7 +144,9 @@ app.post('/api/auth/google', async (req, res) => {
             message: 'Authentication & MongoDB Atlas sync successful',
             userId: user ? user._id : userGoogleId,
             email: userEmail,
-            name: userName
+            name: userName,
+            avatarUrl: userAvatarUrl,
+            sessionToken: sessionToken
         });
 
     } catch (error) {
