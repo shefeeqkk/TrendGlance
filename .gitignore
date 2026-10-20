@@ -13,3 +13,7 @@ local.properties
 *.apk
 *.keystore
 *.jks
+
+# Backend
+backend/node_modules/
+backend/.env

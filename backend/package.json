@@ -1,0 +1,29 @@
+{
+  "name": "trendglance-auth-backend",
+  "version": "1.0.0",
+  "description": "Backend authentication and MongoDB Atlas server for TrendGlance Android App",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [
+    "trendglance",
+    "android",
+    "express",
+    "mongodb",
+    "google-auth"
+  ],
+  "author": "TrendGlance Team",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "google-auth-library": "^9.15.0",
+    "mongoose": "^8.9.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
